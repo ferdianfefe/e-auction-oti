@@ -12,6 +12,10 @@ app.use(express.json());
 /* Enable CORS */
 app.use(cors());
 
+/* Routes */
+const userRouter = require("./routes/user");
+
+app.use("/api/user", userRouter);
 app.use(express.static("public"));
 
 app.get("*", (req, res) => {

@@ -41,6 +41,7 @@ async function signup(req, res) {
 /* Login user */
 async function signin(req, res) {
   let { username, password } = req.body;
+  console.log(req.body);
 
   /* check if user exists */
   let user = await User.findOne({ username });
@@ -60,7 +61,7 @@ async function signin(req, res) {
   }
 
   /* generate token */
-  const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET, {
+  const token = await jwt.sign({ _id: user._id }, process.env.SECRET, {
     expiresIn: "1h",
   });
 

@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 
 const verifyToken = async (req, res, next) => {
   const token = req.headers["x-access-token"] || req.headers["authorization"];
-
   /* if token does not exist */
   if (!token) {
     return res.status(401).json({
@@ -14,7 +13,7 @@ const verifyToken = async (req, res, next) => {
 
   /* check if token is valid */
   try {
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = await jwt.verify(token, process.env.SECRET);
     req.user = decoded;
     next();
   } catch (err) {

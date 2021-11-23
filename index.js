@@ -21,8 +21,10 @@ mongoose.connect(process.env.MONGOURI, (err) => {
 
 /* Routes */
 const userRouter = require("./routes/user");
+const auctionRouter = require("./routes/auction");
 
 app.use("/api/user", userRouter);
+app.use("/api/auction", auctionRouter);
 app.use(express.static("public"));
 
 app.get("*", (req, res) => {

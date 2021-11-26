@@ -42,7 +42,6 @@ async function signup(req, res) {
 /* Login user */
 async function signin(req, res) {
   let { username, password } = req.body;
-  console.log(req.body);
 
   /* check if user exists */
   let user = await User.findOne({ username });

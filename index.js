@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 const app = express();
 
 /* Body parser */
-app.use(express.json());
+app.use(express.json({limit: '25mb'}));
 
 /* Enable CORS */
 app.use(cors());
@@ -22,6 +22,7 @@ mongoose.connect(process.env.MONGOURI, (err) => {
 /* Routes */
 const userRouter = require("./routes/user");
 const auctionRouter = require("./routes/auction");
+const coinRouter = require("./routes/coin");
 
 app.use("/api/user", userRouter);
 app.use("/api/auction", auctionRouter);

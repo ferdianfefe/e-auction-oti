@@ -61,7 +61,11 @@ async function signin(req, res) {
   }
 
   /* generate token */
-  const token = await createToken(user);
+  const token = await createToken({
+    _id: user._id,
+    name: user.name,
+    username: user.username,
+  });
 
   if (!token) {
     return res.status(500).json({
@@ -70,9 +74,32 @@ async function signin(req, res) {
     });
   }
 
-  return res
-    .status(200)
-    .json({ success: true, message: "User logged in successfully", token });
+  return res.status(200).json({
+    success: true,
+    message: "User logged in successfully",
+    value: {
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+      },
+    },
+  });
 }
 
-module.exports = { signup, signin };
+function getMyProfile(req, res) {
+  return res.status(200).json({
+    success: true,
+    message: "User profile",
+    value: {
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        username: req.user.username,
+      },
+    },
+  });
+}
+
+module.exports = { signup, signin, getMyProfile };

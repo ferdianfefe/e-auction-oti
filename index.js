@@ -3,12 +3,13 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const path = require("path");
 
 /* Create express app */
 const app = express();
 
 /* Body parser */
-app.use(express.json({limit: '25mb'}));
+app.use(express.json({ limit: "25mb" }));
 
 /* Enable CORS */
 app.use(cors());

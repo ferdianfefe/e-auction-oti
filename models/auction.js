@@ -12,7 +12,7 @@ const AuctionSchema = new mongoose.Schema({
   description: String,
   images: [ImageSchema],
   startingPrice: Number,
-  currentPrice: Number,
+  currentBid: Number,
   startDate: Date,
   endDate: Date,
   user: {

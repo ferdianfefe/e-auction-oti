@@ -7,5 +7,8 @@ const auctionController = require("../controllers/auction");
 router.post("", verifyToken, auctionController.createAuction);
 router.get("", verifyToken, auctionController.getAllAuctions);
 router.get("/:id", verifyToken, auctionController.getAuctionById);
+router.put("/:id", verifyToken, auctionController.updateAuction);
+router.delete("/:id", verifyToken, auctionController.deleteAuction);
+router.post("/:id", verifyToken, auctionController.placeBid);
 
 module.exports = router;

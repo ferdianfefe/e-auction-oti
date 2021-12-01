@@ -13,7 +13,7 @@ async function createAuction(req, res) {
       };
     }),
     startingPrice,
-    currentPrice: startingPrice,
+    currentBid: startingPrice,
     user,
   });
 
@@ -50,7 +50,7 @@ async function getAuctionById(req, res) {
 
 async function updateAuction(req, res) {
   const { id } = req.params;
-  const { title, itemName, images, startingPrice, currentPrice } = req.body;
+  const { title, itemName, images, startingPrice, currentBid } = req.body;
 
   const auction = await Auction.findById(id);
 
@@ -70,7 +70,7 @@ async function updateAuction(req, res) {
     };
   });
   auction.startingPrice = startingPrice;
-  auction.currentPrice = currentPrice;
+  auction.currentBid = currentBid;
 
   await auction.save();
 
@@ -100,11 +100,10 @@ async function deleteAuction(req, res) {
   });
 }
 
-async function bid(req, res) {
-  const { id } = req.params;
-  const { bid } = req.body;
+async function placeBid(req, res) {
+  const { bid, auctionId } = req.body;
 
-  const auction = await Auction.findById(id);
+  const auction = await Auction.findById(auctionId);
 
   if (!auction) {
     return res.status(404).json({
@@ -113,16 +112,18 @@ async function bid(req, res) {
     });
   }
 
-  if (auction.currentPrice >= bid) {
+  if (auction.currentBid >= bid) {
     return res.status(400).json({
       success: false,
-      message: "Bid must be greater than current price",
+      message: "Bid must be greater than highest bid",
     });
   }
 
-  auction.currentPrice = bid;
+  auction.currentBid = bid;
 
   await auction.save();
+
+  console.log("Bid placed successfully");
 
   return res.status(200).json({
     success: true,
@@ -136,10 +137,5 @@ module.exports = {
   getAuctionById,
   updateAuction,
   deleteAuction,
-};
-
-module.exports = {
-  createAuction,
-  getAllAuctions,
-  getAuctionById,
+  placeBid,
 };

@@ -38,7 +38,7 @@ async function getAllAuctions(req, res) {
 
 async function getAuctionById(req, res) {
   const { id } = req.params;
-  const auction = await Auction.findById(id);
+  const auction = await Auction.findOne({ _id: id });
 
   return res.status(200).json({
     success: true,

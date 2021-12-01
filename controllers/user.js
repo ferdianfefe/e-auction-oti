@@ -102,4 +102,12 @@ function getMyProfile(req, res) {
   });
 }
 
-module.exports = { signup, signin, getMyProfile };
+async function getContacts(req, res) {
+  const contacts = await User.find({ _id: { $ne: req.user._id } });
+  res.status(200).json({
+    success: true,
+    value: contacts,
+  });
+}
+
+module.exports = { signup, signin, getMyProfile, getContacts };

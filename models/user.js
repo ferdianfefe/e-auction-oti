@@ -5,6 +5,10 @@ const UserSchema = new mongoose.Schema(
     name: String,
     username: String,
     password: String,
+    isOnline: {
+      type: Boolean,
+      default: false,
+    },
     profileImage: {
       type: Buffer,
       select: true,

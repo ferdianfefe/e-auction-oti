@@ -88,7 +88,9 @@ async function signin(req, res) {
   });
 }
 
-function getMyProfile(req, res) {
+async function getMyProfile(req, res) {
+  /* find user */
+  let user = await User.findById(req.user._id);
   return res.status(200).json({
     success: true,
     message: "User profile",
@@ -97,6 +99,7 @@ function getMyProfile(req, res) {
         id: req.user._id,
         name: req.user.name,
         username: req.user.username,
+        balance: user.balance,
       },
     },
   });

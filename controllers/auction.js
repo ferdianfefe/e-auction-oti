@@ -1,8 +1,9 @@
 "use strict";
+const moment = require("moment");
 const Auction = require("../models/auction");
 
 async function createAuction(req, res) {
-  const { title, itemName, images, startingPrice, user } = req.body;
+  const { title, itemName, images, startingPrice } = req.body;
   const auction = new Auction({
     title,
     itemName,
@@ -14,7 +15,9 @@ async function createAuction(req, res) {
     }),
     startingPrice,
     currentBid: startingPrice,
-    user,
+    user: req.user._id,
+    startDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+    endDate: null
   });
 
   await auction.save();
@@ -26,7 +29,7 @@ async function createAuction(req, res) {
 }
 
 async function getAllAuctions(req, res) {
-  const auctions = await Auction.find({});
+  const auctions = await Auction.find({ user: { $ne: req.user._id } });
 
   return res.status(200).json({
     success: true,
@@ -38,12 +41,26 @@ async function getAllAuctions(req, res) {
 
 async function getAuctionById(req, res) {
   const { id } = req.params;
-  const auction = await Auction.findOne({ _id: id });
+  const auction = await Auction.findOne({ _id: id }).populate("user").populate("participants");
 
   return res.status(200).json({
     success: true,
     value: {
       auction,
+    },
+  });
+}
+
+async function getAuctionByUserID(req, res) {
+  const { id } = req.params;
+  console.log(id);
+
+  const auctions = await Auction.find({ user: id }).populate("user");
+
+  return res.status(200).json({
+    success: true,
+    value: {
+      auctions,
     },
   });
 }
@@ -100,6 +117,28 @@ async function deleteAuction(req, res) {
   });
 }
 
+async function endAuction(req, res){
+  const { id } = req.params;
+
+  const auction = await Auction.findById(id);
+
+  if (!auction) {
+    return res.status(404).json({
+      success: false,
+      message: "Auction not found",
+    });
+  }
+
+  auction.endDate = moment().format("YYYY-MM-DD HH:mm:ss");
+
+  await auction.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Auction ended successfully",
+  });
+}
+
 async function placeBid(req, res) {
   const { bid, auctionId } = req.body;
 
@@ -125,6 +164,11 @@ async function placeBid(req, res) {
 
   console.log("Bid placed successfully");
 
+  if(!auction.participants.includes(req.user._id)){
+    auction.participants.push(req.user._id);
+    await auction.save();
+  }
+
   return res.status(200).json({
     success: true,
     message: "Bid added successfully",
@@ -135,7 +179,9 @@ module.exports = {
   createAuction,
   getAllAuctions,
   getAuctionById,
+  getAuctionByUserID,
   updateAuction,
   deleteAuction,
+  endAuction,
   placeBid,
 };

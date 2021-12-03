@@ -69,4 +69,8 @@ io.on("connection", (socket) => {
   socket.on("send-message", (msg) => {
     socket.broadcast.emit("message", msg);
   });
+
+  socket.on("bid-updated", ({auctionId}) => {
+    socket.broadcast.emit("bid-updated", {auctionId});
+  })
 });

@@ -9,7 +9,10 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    balance: Number,
+    balance: {
+      type: Number,
+      default: 0,
+    },
     profileImage: {
       type: Buffer,
       select: true,

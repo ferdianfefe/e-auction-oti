@@ -1,6 +1,7 @@
 "use strict";
 const moment = require("moment");
 const Auction = require("../models/auction");
+const User = require('../models/user');
 
 async function createAuction(req, res) {
   const { title, itemName, images, startingPrice } = req.body;
@@ -17,7 +18,7 @@ async function createAuction(req, res) {
     currentBid: startingPrice,
     user: req.user._id,
     startDate: moment().format("YYYY-MM-DD HH:mm:ss"),
-    endDate: null
+    endDate: null,
   });
 
   await auction.save();
@@ -41,7 +42,9 @@ async function getAllAuctions(req, res) {
 
 async function getAuctionById(req, res) {
   const { id } = req.params;
-  const auction = await Auction.findOne({ _id: id }).populate("user").populate("participants");
+  const auction = await Auction.findOne({ _id: id })
+    .populate("user")
+    .populate("participants.user");
 
   return res.status(200).json({
     success: true,
@@ -51,8 +54,8 @@ async function getAuctionById(req, res) {
   });
 }
 
-async function getAuctionByUserID(req, res) {
-  const { id } = req.params;
+async function getMyAuctions(req, res) {
+  const id = req.user._id;
   console.log(id);
 
   const auctions = await Auction.find({ user: id }).populate("user");
@@ -117,7 +120,7 @@ async function deleteAuction(req, res) {
   });
 }
 
-async function endAuction(req, res){
+async function endAuction(req, res) {
   const { id } = req.params;
 
   const auction = await Auction.findById(id);
@@ -143,11 +146,20 @@ async function placeBid(req, res) {
   const { bid, auctionId } = req.body;
 
   const auction = await Auction.findById(auctionId);
+  /* Get user */
+  const user = await User.findById(req.user._id);
 
   if (!auction) {
     return res.status(404).json({
       success: false,
       message: "Auction not found",
+    });
+  }
+
+  if(bid > user.balance) {
+    return res.status(400).json({
+      success: false,
+      message: "You don't have enough balance to place this bid",
     });
   }
 
@@ -159,15 +171,28 @@ async function placeBid(req, res) {
   }
 
   auction.currentBid = bid;
+  user.balance -= bid;
 
   await auction.save();
+  await user.save();
 
   console.log("Bid placed successfully");
+  let participantData = {
+    user: req.user._id,
+    bid,
+  };
 
-  if(!auction.participants.includes(req.user._id)){
-    auction.participants.push(req.user._id);
-    await auction.save();
+  /* if user is included as participants */
+  if (!auction.participants.find((participant) => participant.user == req.user._id)) {
+    auction.participants.push(participantData);
+  } else {
+    auction.participants.forEach((participant) => {
+      if (participant.user == req.user._id) {
+        participant.bid = bid;
+      }
+    });
   }
+  await auction.save();
 
   return res.status(200).json({
     success: true,
@@ -179,7 +204,7 @@ module.exports = {
   createAuction,
   getAllAuctions,
   getAuctionById,
-  getAuctionByUserID,
+  getMyAuctions,
   updateAuction,
   deleteAuction,
   endAuction,

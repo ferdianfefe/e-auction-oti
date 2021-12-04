@@ -21,8 +21,14 @@ const AuctionSchema = new mongoose.Schema({
   },
   participants: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      bid: {
+        type: Number,
+        default: 0,
+      }
     },
   ],
 });

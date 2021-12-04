@@ -1,7 +1,7 @@
 "use strict";
 const moment = require("moment");
 const Auction = require("../models/auction");
-const User = require('../models/user');
+const User = require("../models/user");
 
 async function createAuction(req, res) {
   const { title, itemName, images, startingPrice } = req.body;
@@ -156,7 +156,7 @@ async function placeBid(req, res) {
     });
   }
 
-  if(bid > user.balance) {
+  if (bid > user.balance) {
     return res.status(400).json({
       success: false,
       message: "You don't have enough balance to place this bid",
@@ -183,7 +183,11 @@ async function placeBid(req, res) {
   };
 
   /* if user is included as participants */
-  if (!auction.participants.find((participant) => participant.user == req.user._id)) {
+  if (
+    !auction.participants.find(
+      (participant) => participant.user == req.user._id
+    )
+  ) {
     auction.participants.push(participantData);
   } else {
     auction.participants.forEach((participant) => {

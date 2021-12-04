@@ -95,12 +95,7 @@ async function getMyProfile(req, res) {
     success: true,
     message: "User profile",
     value: {
-      user: {
-        id: req.user._id,
-        name: req.user.name,
-        username: req.user.username,
-        balance: user.balance,
-      },
+      user,
     },
   });
 }
